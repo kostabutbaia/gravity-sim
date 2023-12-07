@@ -5,7 +5,7 @@ from functools import reduce
 
 G = 1
 def get_acceleration(ob1: Object, ob2: Object) -> list[float]:
-    return -G * ob2.m/np.linalg.norm(ob1.r - ob2.r) * (ob1.r - ob2.r)
+    return -G * ob2.m/np.linalg.norm(ob1.r - ob2.r)**3 * (ob1.r - ob2.r)
 
 class System:
     def __init__(self, objects: list[Object], t_final: float, t_step: float, follow_center: bool):
@@ -29,6 +29,15 @@ class System:
             x_cords.append(o.r[0])
             y_cords.append(o.r[1])
         return [x_cords, y_cords]
+    
+    def get_energy(self):
+        E_k = sum([o.m*np.linalg.norm(o.v)**2/2 for o in self.objects])
+        E_p = 0
+        for o1 in self.objects:
+            for o2 in self.objects:
+                if o1 is not o2:
+                    E_p += G*o1.m*o2.m/np.linalg.norm(o1.r-o2.r)
+        return E_k + 1/2*E_p
 
     def _update_object(self, ob: Object):
         for o in self.objects:
@@ -45,10 +54,12 @@ class System:
         if self.follow_center: self._follow_mass_center()
         t_range = np.arange(0, self.t_final, self.t_step)
         frames = []
+        energies=[]
         for t in t_range:
             frames.append(self.get_system_pos_state())
             self._update_system()
-        return t_range, frames
+            energies.append(self.get_energy())
+        return energies, t_range, frames
 
 
 def main():
