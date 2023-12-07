@@ -4,8 +4,8 @@ from Object import Object
 from functools import reduce
 
 G = 1
-def get_acceleration(ob1: Object, ob2: Object) -> list[float]:
-    return -G * ob2.m/np.linalg.norm(ob1.r - ob2.r)**3 * (ob1.r - ob2.r)
+def get_orbit_speed(M: float, R: float) -> float:
+    return np.sqrt(G*M/R)
 
 class System:
     def __init__(self, objects: list[Object], t_final: float, t_step: float, follow_center: bool):
@@ -14,6 +14,9 @@ class System:
         self.t_step = t_step
         self.follow_center = follow_center
 
+    def get_acceleration(ob1: Object, ob2: Object) -> list[float]:
+        return -G * ob2.m/np.linalg.norm(ob1.r - ob2.r)**3 * (ob1.r - ob2.r)
+    
     def center_of_mass_velocity(self) -> list:
         return reduce(lambda o1, o2: o1.m*o1.v + o2.m*o2.v, self.objects)/reduce(lambda o1, o2: o1.m + o2.m, self.objects)
     
@@ -37,14 +40,15 @@ class System:
             for o2 in self.objects:
                 if o1 is not o2:
                     E_p += G*o1.m*o2.m/np.linalg.norm(o1.r-o2.r)
-        return E_k + 1/2*E_p
+        return E_k - 1/2*E_p
 
     def _update_object(self, ob: Object):
         for o in self.objects:
             if o is not ob:
-                a = get_acceleration(ob, o)
-                ob.v += a * self.t_step
-                ob.r += ob.v * self.t_step
+                # Velocity Verlet Integration
+                a = System.get_acceleration(ob, o)
+                ob.r += ob.v*self.t_step+1/2*a*self.t_step**2
+                ob.v += self.t_step/2*(a+System.get_acceleration(ob, o))
 
     def _update_system(self):
         for o in self.objects:

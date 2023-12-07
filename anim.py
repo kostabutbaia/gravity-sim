@@ -6,8 +6,8 @@ from System import *
 from Object import *
 from Trail import *
 
-NAME = 'test3'
-TRAIL_LENGTH = 30
+NAME = 'Leapfrog2'
+TRAIL_LENGTH = 70
 
 def create_anim_gif(name: str, system: System) -> None:
     fig = plt.figure()
@@ -40,9 +40,12 @@ def create_anim_gif(name: str, system: System) -> None:
 
 
 if __name__ == '__main__':
+    M1 = 1
+    M2 = 1
+
     objects = [
-        Object(10, np.array([0, 0], dtype='float64'), np.array([0, -0.2], dtype='float64')),
-        Object(1, np.array([1, 0], dtype='float64'), np.array([0, np.sqrt(10)], dtype='float64'))
+        Object(2, np.array([0, 0], dtype='float64'), np.array([0, 0], dtype='float64')),
+        Object(1, np.array([1, 0], dtype='float64'), np.array([0, 1], dtype='float64'))
     ]
-    sys = System(objects, 10, 0.02, False)
+    sys = System(objects, 10, 0.02, True)
     create_anim_gif(NAME, sys)
