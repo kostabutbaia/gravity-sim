@@ -50,9 +50,30 @@ class System:
                 ob.r += ob.v*self.t_step+1/2*a*self.t_step**2
                 ob.v += self.t_step/2*(a+System.get_acceleration(ob, o))
 
+    def _update_object_verlet(self, ob: Object):
+        if ob._initialized:
+            last_term = 0
+            for o in self.objects:
+                if o is not ob:
+                    a = System.get_acceleration(ob, o)
+                    last_term += a * self.t_step**2
+
+            _prev_r = np.array(ob.r)
+            ob.r = 2*ob.r - ob._prev_r + last_term
+            ob._prev_r = _prev_r
+        else:
+            ob._initialized = True
+            ob._prev_r = np.array(ob.r)
+            ob.r += ob.v*self.t_step
+            for o in self.objects:
+                if o is not ob:
+                    a = System.get_acceleration(ob, o)
+                    ob.r += 1/2*a*self.t_step**2
+                
+
     def _update_system(self):
         for o in self.objects:
-            self._update_object(o)
+            self._update_object_verlet(o)
 
     def get_frames(self) -> list:
         if self.follow_center: self._follow_mass_center()

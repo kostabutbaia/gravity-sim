@@ -6,7 +6,7 @@ from System import *
 from Object import *
 from Trail import *
 
-NAME = 'Leapfrog2'
+NAME = 'Leapfrog3'
 TRAIL_LENGTH = 70
 
 def create_anim_gif(name: str, system: System) -> None:

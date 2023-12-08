@@ -3,3 +3,5 @@ class Object:
         self.m = m
         self.r = r
         self.v = v
+        self._prev_r = None
+        self._initialized = False
