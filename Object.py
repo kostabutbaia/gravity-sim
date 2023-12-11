@@ -3,5 +3,6 @@ class Object:
         self.m = m
         self.r = r
         self.v = v
-        self._prev_r = None
-        self._initialized = False
+        self.prev_r = None
+        self.positions = [r]
+        self.first_iter = True

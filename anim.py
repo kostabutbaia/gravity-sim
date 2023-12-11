@@ -2,11 +2,11 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import PillowWriter
 import numpy as np
 
-from System import *
+from Verlet import System
 from Object import *
 from Trail import *
 
-NAME = 'Leapfrog3'
+NAME = 'Leapfrog4'
 TRAIL_LENGTH = 70
 
 def create_anim_gif(name: str, system: System) -> None:
@@ -16,7 +16,7 @@ def create_anim_gif(name: str, system: System) -> None:
     plt.grid()
     plt.gca().set_aspect('equal')
 
-    energies, _, frames = system.get_frames()
+    _, frames = system.get_frames()
     l, = plt.plot([], [], 'o')
 
     trail_plots = []
@@ -31,7 +31,7 @@ def create_anim_gif(name: str, system: System) -> None:
         for k, frame in enumerate(frames):
             x_points, y_points = frame
             l.set_data(x_points, y_points)
-            plt.title(f"energy: {round(energies[k], 5)}", loc = 'left')
+            # plt.title(f"energy: {round(energies[k], 5)}", loc = 'left')
             for i in range(len(frame)):
                 x_trail, y_trail = trails[i].update_trail(x_points[i], y_points[i])
                 trail_plots[i].set_data(x_trail, y_trail)
