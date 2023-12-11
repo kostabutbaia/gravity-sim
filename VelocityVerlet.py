@@ -18,8 +18,8 @@ class VelocityVerlet(System):
     def amount(self) -> int:
         return len(self.objects)
 
-    def get_acceleration(ob1: Object, ob2: Object) -> list[float]:
-        return -G * ob2.m/np.linalg.norm(ob1.r - ob2.r)**3 * (ob1.r - ob2.r)
+    def get_acceleration(r1: list, r2: list, M2: float) -> list[float]:
+        return -G * M2/np.linalg.norm(r1 - r2)**3 * (r1 - r2)
     
     def center_of_mass_velocity(self) -> list:
         return reduce(lambda o1, o2: o1.m*o1.v + o2.m*o2.v, self.objects)/reduce(lambda o1, o2: o1.m + o2.m, self.objects)
@@ -46,17 +46,34 @@ class VelocityVerlet(System):
                     E_p += G*o1.m*o2.m/np.linalg.norm(o1.r-o2.r)
         return E_k - 1/2*E_p
 
-    def _update_object(self, ob: Object):
+    def _update_object_r(self, ob: Object):
+        new_r = ob.r + ob.v*self.t_step
         for o in self.objects:
             if o is not ob:
                 # Velocity Verlet Integration
-                a = VelocityVerlet.get_acceleration(ob, o)
-                ob.r += ob.v*self.t_step+1/2*a*self.t_step**2
-                ob.v += self.t_step/2*(a+VelocityVerlet.get_acceleration(ob, o))
+                a = VelocityVerlet.get_acceleration(ob.r, o.r, o.m)
+                new_r += 1/2*a*self.t_step**2
+        return new_r
+    
+    def _update_object_v(self, ob: Object, updates_r: dict):
+        new_v = np.array(ob.v)
+        for o in self.objects:
+            if o is not ob:
+                # Velocity Verlet Integration
+                a = VelocityVerlet.get_acceleration(ob.r, o.r, o.m)
+                new_v += self.t_step/2*(a+VelocityVerlet.get_acceleration(updates_r[id(ob)], updates_r[id(o)], o.m))
+        return new_v
 
     def _update_system(self):
+        updates_r = dict()
+        updates_v = dict()
         for o in self.objects:
-            self._update_object(o)
+            updates_r[id(o)] = self._update_object_r(o)
+        for o in self.objects:
+            updates_v[id(o)] = self._update_object_v(o, updates_r)
+        for o in self.objects:
+            o.r = updates_r[id(o)]
+            o.v = updates_v[id(o)]
 
     def get_frames(self) -> list:
         if self.follow_center: self._follow_mass_center()
@@ -67,7 +84,7 @@ class VelocityVerlet(System):
             frames.append(self.get_system_pos_state())
             self._update_system()
             energies.append(self.get_energy())
-        return energies, t_range, frames
+        return t_range, frames
 
 
 def main():

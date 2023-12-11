@@ -7,8 +7,9 @@ from Object import *
 from Trail import *
 
 from Verlet import *
+from VelocityVerlet import *
 
-NAME = 'Leapfrog_Test'
+NAME = 'VelocityVerlet2'
 TRAIL_LENGTH = 70
 
 def create_anim_gif(
@@ -52,6 +53,6 @@ if __name__ == '__main__':
         Object(2, np.array([0, 0], dtype='float64'), np.array([0, 0], dtype='float64')),
         Object(1, np.array([1, 0], dtype='float64'), np.array([0, 1], dtype='float64'))
     ]
-    sys = Verlet(objects, 10, 0.02, True)
+    sys = VelocityVerlet(objects, 10, 0.02, True)
 
-    create_anim_gif(NAME, 'Verlet', sys, [-2, 2], [-1, 3])
+    create_anim_gif(NAME, 'Velocity Verlet 1', sys, [-2, 2], [-1, 3])

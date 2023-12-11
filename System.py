@@ -3,4 +3,4 @@ class System:
         pass
 
     def amount(self) -> int:
-        return len(self.objects)
+        pass
