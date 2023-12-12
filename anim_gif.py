@@ -1,30 +1,32 @@
 import matplotlib.pyplot as plt
 from matplotlib.animation import PillowWriter
 import numpy as np
+import os
 
-from System import *
+from solvers.System import *
 from Object import *
 from Trail import *
 
-from Verlet import *
-from VelocityVerlet import *
+from solvers.Verlet import *
+from solvers.VelocityVerlet import *
+from solvers.Leapfrog import *
 
-NAME = 'VelocityVerlet2'
-TRAIL_LENGTH = 70
+import cases.elliptic
+from cases.case import Case
+from cases.elliptic import *
+
+TRAIL_LENGTH = 200
 
 def create_anim_gif(
-        name: str, 
-        title: str, 
         system: System,
-        xlims: list[float],
-        ylims: list[float]
+        case: Case,
 ) -> None:
     fig = plt.figure()
-    plt.xlim(xlims[0], xlims[1])
-    plt.ylim(ylims[0], ylims[1])
+    plt.xlim(case.get_xlims()[0], case.get_xlims()[1])
+    plt.ylim(case.get_ylims()[0], case.get_ylims()[1])
     plt.grid()
     plt.gca().set_aspect('equal')
-    plt.title(title)
+    plt.title(f'${case.get_name()}$: {system.get_method_name()} | $\delta t={system.get_time_step()}$')
 
     _, frames = system.get_frames()
     l, = plt.plot([], [], 'o')
@@ -37,7 +39,10 @@ def create_anim_gif(
         trail_plots.append(p)
     
     writer = PillowWriter(fps=15)
-    with writer.saving(fig, f'solutions/{name}.gif', 100):
+
+    full_path = f'solutions/{case.get_name()}/{system.get_method_name()}/{case.get_name()}_{system.get_time_step()}.gif'
+    os.makedirs(os.path.dirname(full_path), exist_ok=True)
+    with writer.saving(fig, full_path, 100):
         for frame in frames:
             x_points, y_points = frame
             l.set_data(x_points, y_points)
@@ -47,12 +52,8 @@ def create_anim_gif(
             
             writer.grab_frame()
 
-
 if __name__ == '__main__':
-    objects = [
-        Object(2, np.array([0, 0], dtype='float64'), np.array([0, 0], dtype='float64')),
-        Object(1, np.array([1, 0], dtype='float64'), np.array([0, 1], dtype='float64'))
-    ]
-    sys = VelocityVerlet(objects, 10, 0.02, True)
+    objects = Elliptic().get_objects()
+    sys = Leapfrog(objects, 10, 0.02, True)
 
-    create_anim_gif(NAME, 'Velocity Verlet 1', sys, [-2, 2], [-1, 3])
+    create_anim_gif(sys, Elliptic())
