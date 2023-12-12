@@ -1,7 +1,6 @@
 import numpy as np
 from Object import Object
 
-from functools import reduce
 from solvers.System import *
 
 class Leapfrog(System):
@@ -25,7 +24,7 @@ class Leapfrog(System):
         return -Leapfrog.G * M2/np.linalg.norm(r1 - r2)**3 * (r1 - r2)
     
     def center_of_mass_velocity(self) -> list:
-        return reduce(lambda o1, o2: o1.m*o1.v + o2.m*o2.v, self.objects)/reduce(lambda o1, o2: o1.m + o2.m, self.objects)
+        return sum([o.m*o.v  for o in self.objects])/sum([o.m for o in self.objects])
     
     def _follow_mass_center(self):
         mass_vel = self.center_of_mass_velocity()

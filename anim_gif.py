@@ -46,7 +46,7 @@ def create_anim_gif(
         for frame in frames:
             x_points, y_points = frame
             l.set_data(x_points, y_points)
-            for i in range(len(frame)):
+            for i in range(len(trails)):
                 x_trail, y_trail = trails[i].update_trail(x_points[i], y_points[i])
                 trail_plots[i].set_data(x_trail, y_trail)
             
