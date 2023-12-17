@@ -5,4 +5,5 @@ class Object:
         self.v = v
         self.prev_r = None
         self.positions = [r]
+        self.velocities = [v]
         self.first_iter = True
