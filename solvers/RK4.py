@@ -35,8 +35,8 @@ class RK4(System):
         x_cords = []
         y_cords = []
         for o in self.objects:
-            x_cords.append(o.positions[-1][0])
-            y_cords.append(o.positions[-1][1])
+            x_cords.append(o.r[0])
+            y_cords.append(o.r[1])
         return [x_cords, y_cords]
 
     def _update_object(self, ob: Object):
@@ -45,31 +45,31 @@ class RK4(System):
             if o is not ob:
                 a += RK4.get_acceleration(ob.r, o.r, o.m)
         k1 = self.t_step*a
-        l1 = self.t_step*ob.velocities[-1]
+        l1 = self.t_step*ob.v
 
         a = 0
         for o in self.objects:
             if o is not ob:
                 a += RK4.get_acceleration(ob.r+0.5*l1, o.r, o.m)
         k2 = self.t_step*a
-        l2 = self.t_step*(ob.velocities[-1] + 0.5*k1)
+        l2 = self.t_step*(ob.v + 0.5*k1)
 
         a = 0
         for o in self.objects:
             if o is not ob:
                 a += RK4.get_acceleration(ob.r+0.5*l2, o.r, o.m)
         k3 = self.t_step*a
-        l3 = self.t_step*(ob.velocities[-1] + 0.5*k2)
+        l3 = self.t_step*(ob.v + 0.5*k2)
 
         a = 0
         for o in self.objects:
             if o is not ob:
                 a += RK4.get_acceleration(ob.r+l3, o.r, o.m)
         k4 = self.t_step*a
-        l4 = self.t_step*(ob.velocities[-1] + k3)
+        l4 = self.t_step*(ob.v + k3)
 
-        v_new = ob.velocities[-1] + 1/6*(k1+2*k2+2*k3+k4)
-        pos_new = ob.positions[-1] + 1/6*(l1+2*l2+2*l3+l4)
+        v_new = ob.v + 1/6*(k1+2*k2+2*k3+k4)
+        pos_new = ob.r + 1/6*(l1+2*l2+2*l3+l4)
 
         return pos_new, v_new
 
@@ -79,9 +79,8 @@ class RK4(System):
             updates[id(o)] = self._update_object(o)
         for o in self.objects:
             pos_new, v_new = updates[id(o)]
-            o.positions.append(pos_new)
-            o.velocities.append(v_new)
             o.r = pos_new
+            o.v = v_new
 
     def get_frames(self) -> list:
         if self.follow_center: self._follow_mass_center()
