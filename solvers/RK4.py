@@ -71,12 +71,17 @@ class RK4(System):
         v_new = ob.velocities[-1] + 1/6*(k1+2*k2+2*k3+k4)
         pos_new = ob.positions[-1] + 1/6*(l1+2*l2+2*l3+l4)
 
-        ob.velocities.append(v_new)
-        ob.positions.append(pos_new)
+        return pos_new, v_new
 
     def _update_system(self):
+        updates = dict()
         for o in self.objects:
-            self._update_object(o)
+            updates[id(o)] = self._update_object(o)
+        for o in self.objects:
+            pos_new, v_new = updates[id(o)]
+            o.positions.append(pos_new)
+            o.velocities.append(v_new)
+            o.r = pos_new
 
     def get_frames(self) -> list:
         if self.follow_center: self._follow_mass_center()
