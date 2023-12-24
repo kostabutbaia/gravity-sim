@@ -31,5 +31,5 @@ def create_anims(case: Case, t_final: float, t_step: float, follow_center: bool)
     # print('Leapfrog Method Done!')
 
 if __name__ == '__main__':
-    create_anims(Elliptic(), 10, 0.02, True)
+    create_anims(PlutoCharon(), 10, 0.01, True)
 
