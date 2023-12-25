@@ -28,7 +28,7 @@ def create_anim_gif(
     plt.gca().set_aspect('equal')
     plt.title(f'${case.get_name()}$: {system.get_method_name()} | $\delta t={system.get_time_step()}$')
 
-    _, frames = system.get_frames()
+    info, frames = system.get_frames()
     l, = plt.plot([], [], 'o')
 
     trail_plots = []
@@ -43,7 +43,8 @@ def create_anim_gif(
     full_path = f'solutions/{case.get_name()}/{system.get_method_name()}/{case.get_name()}_{system.get_time_step()}.gif'
     os.makedirs(os.path.dirname(full_path), exist_ok=True)
     with writer.saving(fig, full_path, 100):
-        for frame in frames:
+        for i, frame in enumerate(frames):
+            # plt.title(f'${case.get_name()}$: {system.get_method_name()} | $\delta t={system.get_time_step()}$ | info: {round(np.linalg.norm(info[i][1]), 4)}')
             x_points, y_points = frame
             l.set_data(x_points, y_points)
             for i in range(len(trails)):

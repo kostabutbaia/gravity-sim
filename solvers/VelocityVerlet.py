@@ -38,6 +38,12 @@ class VelocityVerlet(System):
             x_cords.append(o.r[0])
             y_cords.append(o.r[1])
         return [x_cords, y_cords]
+    
+    def get_system_vel_state(self) -> list:
+        v = []
+        for o in self.objects:
+            v.append(o.v)
+        return v
 
     def _update_object_r(self, ob: Object):
         new_r = ob.r + ob.v*self.t_step
@@ -72,10 +78,12 @@ class VelocityVerlet(System):
         if self.follow_center: self._follow_mass_center()
         t_range = np.arange(0, self.t_final, self.t_step)
         frames = []
+        vels = []
         for _ in t_range:
             frames.append(self.get_system_pos_state())
+            vels.append(self.get_system_vel_state())
             self._update_system()
-        return t_range, frames
+        return vels, frames
 
 
 def main():
